@@ -68,6 +68,9 @@ h2{margin:0;font-size:22px;font-weight:800;color:var(--acc)}
 .line .t{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .line .s{font-size:13px;color:var(--mute)}
 .line .step{background:#fff}.line .step button{width:36px}
+.lineW{display:flex;flex-direction:column;gap:6px}
+.note{margin-left:58px;height:36px;padding:0 10px;border:1px dashed var(--line2);border-radius:10px;background:#fff;font-size:13px;min-width:0}
+.note:focus{border-style:solid;border-color:var(--acc)}
 .blk{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line2);padding-top:16px}
 .f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700}
 .f input,.f select,.f textarea{height:44px;padding:0 12px;border:1px solid var(--line2);border-radius:12px;background:#fff;font-size:15px;font-weight:500;width:100%}
@@ -182,7 +185,7 @@ h2{margin:0;font-size:22px;font-weight:800;color:var(--acc)}
       <label class="chk"><input type="checkbox" id="paid"> Sudah bayar via QRIS</label>
     </div>
     <div id="payCash" class="paybox"><b>Bayar tunai di kasir</b><p>Kirim pesanan lewat WhatsApp, lalu lakukan pembayaran di kasir ya.</p></div>
-    <label class="f">Catatan (opsional)<textarea id="catatan" rows="2" maxlength="200" placeholder="cth. tidak pedas, less sugar"></textarea></label>
+    <label class="f">Catatan umum (opsional)<textarea id="catatan" rows="2" maxlength="200" placeholder="cth. tidak pedas, less sugar"></textarea></label>
   </div>
 
   <div class="blk">
@@ -249,7 +252,7 @@ function foto(x){ return FOLDER_FOTO + slug(x[1]) + '.jpg'; }
 
 var cats = []; MENU.forEach(function(x){ if (cats.indexOf(x[0]) < 0) cats.push(x[0]); });
 var S = { cat:cats[0], q:'', size:{}, qty:{}, cart:{}, tipe:'Takeaway', meja:'', kuah:'Original', sayur:'Pakai sayur', bayar:'QRIS',
-          sambel:0, split:false, splitMode:'item', people:['Orang 1','Orang 2'], assign:{}, nominal:[0,0], added:'' };
+          sambel:0, notes:{}, split:false, splitMode:'item', people:['Orang 1','Orang 2'], assign:{}, nominal:[0,0], added:'' };
 
 var hm = /^#meja-(\d{1,2})$/.exec(location.hash || '');
 if (hm) { S.tipe = 'Dine-in'; S.meja = hm[1]; }
@@ -322,8 +325,9 @@ function renderCart(){
   var c = calc(), ls = c.ls, isDine = S.tipe==='Dine-in', isAntar = S.tipe==='Delivery';
   $('tipe').innerHTML = segHTML([['Dine-in','Makan di sini'],['Takeaway','Bungkus'],['Delivery','Antar']], S.tipe);
   $('lines').innerHTML = ls.length ? ls.map(function(l){
-    return '<div class="line">'+(l.x ? '<img src="'+foto(l.x)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;th&quot;></div>\'">' : '<div class="th"></div>')+'<div class="g"><div class="t">'+esc(l.label)+'</div><div class="s num">'+rp(l.harga)+(l.qty>1?' · '+rp(l.harga*l.qty):'')+'</div></div>'
-      + '<div class="step"><button type="button" data-c="'+l.k+'" data-d="-1" aria-label="Kurangi">−</button><span class="num">'+l.qty+'</span><button type="button" data-c="'+l.k+'" data-d="1" aria-label="Tambah">+</button></div></div>';
+    return '<div class="lineW"><div class="line">'+(l.x ? '<img src="'+foto(l.x)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;th&quot;></div>\'">' : '<div class="th"></div>')+'<div class="g"><div class="t">'+esc(l.label)+'</div><div class="s num">'+rp(l.harga)+(l.qty>1?' · '+rp(l.harga*l.qty):'')+'</div></div>'
+      + '<div class="step"><button type="button" data-c="'+l.k+'" data-d="-1" aria-label="Kurangi">−</button><span class="num">'+l.qty+'</span><button type="button" data-c="'+l.k+'" data-d="1" aria-label="Tambah">+</button></div></div>'
+      + (l.x ? '<input class="note" data-nt="'+l.k+'" maxlength="80" value="'+esc(S.notes[l.k]||'')+'" placeholder="'+(DRINKS.indexOf(l.kat) >= 0 ? 'Catatan: less sugar, less ice…' : 'Catatan: tanpa bawang goreng, tidak pedas…')+'" aria-label="Catatan untuk '+esc(l.label)+'">' : '') + '</div>';
   }).join('') : '<div class="empty">Keranjang masih kosong.<br>Pilih menu lalu tekan Tambah.</div>';
 
   $('fMeja').hidden = !isDine; $('fWa').hidden = isDine; $('fAlamat').hidden = !isAntar;
@@ -376,7 +380,7 @@ function buildMsg(c){
   var m = ['*PESANAN — sade.*', where, 'Nama: ' + (nama||'-') + (wa && S.tipe!=='Dine-in' ? ' (' + wa + ')' : '')];
   if (S.tipe==='Delivery') m.push('Alamat: ' + alamat);
   m.push('');
-  c.ls.forEach(function(l){ m.push('• ' + l.qty + 'x ' + l.label + ' — ' + rp(l.qty*l.harga)); });
+  c.ls.forEach(function(l){ m.push('• ' + l.qty + 'x ' + l.label + ' — ' + rp(l.qty*l.harga)); var nt = (S.notes[l.k]||'').trim(); if (nt) m.push('   ↳ _' + nt + '_'); });
   m.push('', '*Total: ' + rp(c.total) + '*', 'Bayar: ' + (S.bayar === 'QRIS' ? 'QRIS' + ($('paid').checked ? ' — SUDAH BAYAR (bukti transfer saya kirim di chat ini)' : ' — belum bayar') : 'Cash di kasir'));
   var note = [];
   if (!$('fKuah').hidden) note.push('Kuah ' + S.kuah);
@@ -404,7 +408,7 @@ $('keranjang').addEventListener('click', function(e){
   if (seg) { var key = {tipe:'tipe',kuah:'kuah',sayur:'sayur',bayar:'bayar',splitMode:'splitMode'}[seg.id]; S[key] = b.dataset.v; renderCart(); return; }
   if (b.dataset.sb) { S.sambel = Math.max(0, Math.min(20, S.sambel + Number(b.dataset.sb))); renderCart(); return; }
   if (b.dataset.c === 'sambel') { S.sambel = Math.max(0, Math.min(20, S.sambel + Number(b.dataset.d))); renderCart(); return; }
-  if (b.dataset.c) { var k = b.dataset.c, n = (S.cart[k]||0) + Number(b.dataset.d); if (n > 0) S.cart[k] = Math.min(99, n); else delete S.cart[k]; renderCart(); return; }
+  if (b.dataset.c) { var k = b.dataset.c, n = (S.cart[k]||0) + Number(b.dataset.d); if (n > 0) S.cart[k] = Math.min(99, n); else { delete S.cart[k]; delete S.notes[k]; } renderCart(); return; }
   if (b.id === 'splitT') { S.split = !S.split; renderCart(); return; }
   if (b.id === 'addP') { S.people.push('Orang ' + (S.people.length+1)); renderCart(); return; }
   if (b.dataset.rm) { var pi = +b.dataset.rm, a = {}; Object.keys(S.assign).forEach(function(k){ var v = S.assign[k]; if (v === pi) return; a[k] = v > pi ? v-1 : v; });
@@ -415,6 +419,7 @@ $('keranjang').addEventListener('click', function(e){
 });
 $('keranjang').addEventListener('input', function(e){
   var t = e.target;
+  if (t.dataset.nt) { S.notes[t.dataset.nt] = t.value; updateSend(); return; }
   if (t.dataset.pn) { S.people[+t.dataset.pn] = t.value; updateSend(); return; }
   if (t.dataset.pa) { var v = Number(t.value.replace(/[^\d]/g,'')) || 0; S.nominal[+t.dataset.pa] = v; var pos = t.value.length; t.value = v ? v.toLocaleString('id-ID') : '';
     var c = calc(), ok = c.diff === 0 && c.total > 0; $('nomMsg').className = 'msg ' + (ok ? 'ok' : 'bad');
