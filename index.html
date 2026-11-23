@@ -252,7 +252,7 @@ function renderMenu(){
   var h = '';
   MENU.forEach(function(x, i){
     if (q ? x[1].toLowerCase().indexOf(q) < 0 : x[0] !== S.cat) return;
-    var sz = S.size[i] || 'R', price = (sz === 'L' && x[3]) ? x[3] : x[2], qty = S.qty[i] || 1, drink = DRINKS.indexOf(x[0]) >= 0;
+    var sz = S.size[i] || 'R', price = (sz === 'L' && x[3]) ? x[3] : x[2], qty = S.qty[i] || 0, drink = DRINKS.indexOf(x[0]) >= 0;
     var key = i + '_' + (x[3] ? sz : '');
     h += '<div class="card"><img class="ph'+(drink?' drink':'')+'" src="'+foto(x)+'" alt="'+esc(x[1])+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;ph none&quot;>Foto menu</div>\'">'
       + '<div class="ct"><span>'+esc(x[1])+'</span><b class="num">'+rp(price)+'</b></div>'
@@ -267,7 +267,7 @@ $('q').addEventListener('input', function(){ S.q = this.value; renderMenu(); });
 $('grid').addEventListener('click', function(e){
   var b = e.target.closest('button'); if (!b) return;
   if (b.dataset.size) { S.size[b.dataset.size] = b.dataset.v; renderMenu(); return; }
-  if (b.dataset.q) { var i = b.dataset.q; S.qty[i] = Math.max(1, Math.min(99, (S.qty[i]||1) + Number(b.dataset.d))); renderMenu(); return; }
+  if (b.dataset.q) { var i = b.dataset.q; S.qty[i] = Math.max(0, Math.min(99, (S.qty[i]||0) + Number(b.dataset.d))); renderMenu(); return; }
   if (b.dataset.add) {
     var i = +b.dataset.add, x = MENU[i], key = i + '_' + (x[3] ? (S.size[i]||'R') : '');
     S.cart[key] = Math.min(99, (S.cart[key]||0) + (S.qty[i]||1)); delete S.qty[i]; S.added = key;
