@@ -1,0 +1,16 @@
+MENU SADE — CARA GANTI FOTO
+
+1. Buka folder "img". Setiap foto diberi nama sesuai menunya,
+   contoh: paket-np-dada.jpg, thai-tea.jpg, bakso-keju.jpg
+2. Siapkan foto baru, format JPG (persegi atau 4:3 paling bagus).
+3. Ganti nama foto baru PERSIS sama dengan foto lama, lalu timpa (replace) file lamanya.
+4. Upload ulang folder ini ke hosting (Netlify Drop / GitHub Pages / hosting lain).
+
+Ubah harga, nomor WhatsApp, atau jumlah meja:
+buka index.html, cari bagian "PENGATURAN" di dalam <script>.
+Kalau menambah menu baru, tambahkan juga fotonya di folder img
+dengan nama: huruf kecil, spasi & tanda + diganti "-".
+Contoh: "Paket NP + Dada"  ->  paket-np-dada.jpg
+
+Kalau dihosting di alamat baru, ganti PAGE_URL di index.html
+dengan alamat baru itu, lalu cetak ulang QR (buka alamat#kartu-qr).

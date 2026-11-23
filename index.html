@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menu sade.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#F7E1CF;--app:#FFF7F0;--side:#FFF2E6;--line:#F0DCCB;--line2:#EBD5C3;--ink:#2B1C14;--ink2:#4A3427;--mute:#7A5E4C;--acc:#B5531A;--accS:#F9D9BF;--accInk:#7A3410;--btn:#8A5230;--ph:#F6E3D3;--ok:#2E6A4E;--okS:#E3EFE8;--bad:#8A2E1E;--badS:#FBE3DC}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.wrap{padding:24px 16px}
+.app{max-width:1360px;margin:0 auto;background:var(--app);border:1px solid var(--line);border-radius:28px;display:flex;flex-wrap:wrap;overflow:hidden}
+aside{flex:1 1 200px;padding:28px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:28px}
+.brand{padding:0 10px}
+.brand b{display:block;font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:40px;line-height:1;color:var(--acc)}
+.brand small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;color:var(--ink2);font-weight:600;font-size:14px;text-decoration:none}
+.nav a.on{background:var(--accS);color:var(--accInk);font-weight:700}
+.nav svg{width:20px;height:20px;flex-shrink:0}
+.badge{margin-left:auto;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--acc);color:#fff;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+main{flex:999 1 560px;min-width:0;padding:28px 24px;display:flex;flex-direction:column;gap:20px}
+.search{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line2);border-radius:99px;padding:0 18px;height:48px}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:15px;min-width:0}
+h1{margin:0;font-size:34px;font-weight:800;letter-spacing:-.02em}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.pill{height:44px;padding:0 18px;border-radius:99px;border:1.5px solid var(--line2);background:#fff;color:var(--ink2);font-size:14px;font-weight:600}
+.pill[aria-pressed=true]{border-color:var(--acc);background:var(--acc);color:#fff;font-weight:700}
+.hint{font-size:13px;color:var(--mute);margin-top:-8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.ph{width:100%;height:150px;border-radius:14px;background:var(--ph);object-fit:cover;display:block}
+.ph.drink{object-fit:contain;background:#FBEFE4}
+.ph.none{display:flex;align-items:center;justify-content:center;color:#A0785E;font-size:12px;font-weight:600}
+.ct{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-weight:700;font-size:15px;line-height:1.3}
+.ct b{font-weight:800;white-space:nowrap}
+.lbl{font-size:12px;font-weight:700;color:var(--mute);margin-bottom:6px}
+.sizes{display:flex;gap:6px}
+.sz{flex:1;height:44px;border-radius:99px;border:1.5px solid var(--line2);background:#fff;color:var(--ink2);font-size:13px;font-weight:600}
+.sz[aria-pressed=true]{border-color:var(--acc);background:var(--accS);color:var(--accInk);font-weight:700}
+.act{display:flex;align-items:center;gap:8px;margin-top:auto}
+.step{display:flex;align-items:center;border:1px solid var(--line2);border-radius:99px;background:var(--app)}
+.step button{width:40px;height:44px;border:0;background:transparent;font-size:18px;font-weight:700;color:var(--ink2)}
+.step span{min-width:18px;text-align:center;font-weight:800}
+.add{flex:1;height:44px;border:0;border-radius:99px;background:var(--btn);color:#fff;font-size:13.5px;font-weight:700}
+.empty{padding:28px 12px;text-align:center;color:var(--mute);font-size:14px;border:1.5px dashed #E8CDB6;border-radius:16px}
+#keranjang{flex:1 1 320px;padding:28px 22px;border-left:1px solid var(--line);background:var(--side);display:flex;flex-direction:column;gap:18px}
+h2{margin:0;font-size:22px;font-weight:800}
+.seg{display:grid;gap:6px;background:#fff;border:1px solid var(--line2);border-radius:16px;padding:5px}
+.seg button{height:46px;border:0;border-radius:12px;background:transparent;color:var(--ink2);font-size:13px;font-weight:600}
+.seg button[aria-pressed=true]{background:var(--accS);color:var(--accInk);font-weight:700}
+.lines{display:flex;flex-direction:column;gap:10px}
+.line{display:flex;align-items:center;gap:10px}
+.line img,.line .th{width:48px;height:48px;border-radius:12px;object-fit:cover;background:var(--ph);flex-shrink:0}
+.line .g{flex:1;min-width:0}
+.line .t{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line .s{font-size:13px;color:var(--mute)}
+.line .step{background:#fff}.line .step button{width:36px}
+.blk{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line2);padding-top:16px}
+.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700}
+.f input,.f select,.f textarea{height:44px;padding:0 12px;border:1px solid var(--line2);border-radius:12px;background:#fff;font-size:15px;font-weight:500;width:100%}
+.f textarea{height:auto;padding:10px 12px;resize:vertical}
+.opt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.opt button{height:44px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;color:var(--ink2);font-size:13px;font-weight:600}
+.opt button[aria-pressed=true]{border-color:var(--acc);background:var(--accS);color:var(--accInk);font-weight:700}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sw b{display:block;font-size:14px}.sw small{font-size:12.5px;color:var(--mute)}
+.toggle{width:56px;height:32px;border:0;border-radius:99px;background:#D9C2B1;padding:3px;display:flex}
+.toggle span{width:26px;height:26px;border-radius:50%;background:#fff}
+.toggle[aria-pressed=true]{background:var(--acc);justify-content:flex-end}
+.person{display:flex;align-items:center;gap:6px}
+.person .no{width:26px;height:26px;border-radius:50%;background:var(--accS);color:var(--accInk);font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.person input{flex:1 1 0;min-width:0;height:44px;padding:0 10px;border:1px solid var(--line2);border-radius:12px;background:#fff;font-size:14px;font-weight:600}
+.person input.amt{flex:0 0 108px;text-align:right;font-weight:700}
+.person .tot{width:92px;text-align:right;font-size:14px;font-weight:800}
+.person .x{width:36px;height:44px;border:0;background:transparent;color:var(--mute);font-size:18px}
+.dash{height:44px;border:1.5px dashed #D9B79C;border-radius:12px;background:transparent;color:var(--btn);font-size:13px;font-weight:700}
+.outline{height:44px;border:1.5px solid var(--btn);border-radius:12px;background:transparent;color:var(--btn);font-size:13px;font-weight:700}
+.sl{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.sl .h{display:flex;justify-content:space-between;gap:8px;font-size:13px}.sl .h b{font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{height:36px;padding:0 12px;border-radius:99px;border:1.5px solid var(--line2);background:#fff;color:var(--ink2);font-size:12.5px;font-weight:600}
+.chips button[aria-pressed=true]{border-color:var(--acc);background:var(--accS);color:var(--accInk);font-weight:700}
+.msg{font-size:13px;font-weight:700;border-radius:10px;padding:8px 10px}
+.msg.ok{color:var(--ok);background:var(--okS)}.msg.bad{color:var(--bad);background:var(--badS)}
+.sum{display:flex;flex-direction:column;gap:8px}
+.sum div{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2)}
+.sum .big{font-size:18px;font-weight:800;color:var(--ink)}
+.send{display:flex;align-items:center;justify-content:center;height:52px;border-radius:99px;background:var(--btn);color:#fff;font-size:15px;font-weight:800;text-decoration:none;border:0;width:100%}
+.send[aria-disabled=true]{background:#D9C2B1;color:#5B4536;pointer-events:none}
+.why{font-size:12.5px;color:var(--mute);text-align:center;min-height:16px}
+.fallback{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--mute)}
+.fallback code{font-family:inherit;font-weight:800;color:var(--ink)}
+.small{height:36px;padding:0 12px;border-radius:10px;border:1.5px solid var(--btn);background:transparent;color:var(--btn);font-size:12.5px;font-weight:700}
+.mbar{display:none}
+@media (max-width:880px){
+ .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:20;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:#fff;border-radius:18px;padding:10px 10px 10px 18px;text-decoration:none;box-shadow:0 8px 24px rgba(43,28,20,.25)}
+ .mbar[hidden]{display:none}
+ .mbar small{display:block;font-size:12px;color:#E6D3C4}.mbar b{font-size:17px}
+ .mbar span.go{background:var(--btn);border-radius:12px;padding:12px 16px;font-weight:800;font-size:14px}
+ body.hascart .wrap{padding-bottom:96px}
+ aside{border-right:0;border-bottom:1px solid var(--line);padding:18px;gap:14px}
+ .nav{flex-direction:row;flex-wrap:wrap}
+ #keranjang{border-left:0;border-top:1px solid var(--line)}
+ main{padding:20px 16px}
+}
+#qrView{max-width:1000px;margin:0 auto;padding:24px 16px}
+.qrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:14px}
+.qr{background:#fff;border:3px solid var(--acc);border-radius:16px;overflow:hidden;text-align:center}
+.qr .hd{background:var(--acc);color:#fff;font-family:'DM Serif Display',Georgia,serif;font-size:26px;padding:6px 0}
+.qr .code{display:flex;justify-content:center;padding:12px 12px 4px}
+.qr .code img,.qr .code canvas{max-width:100%;height:auto}
+.qr .lb{font-weight:800;font-size:18px;color:var(--acc)}
+.qr .sm{font-size:12px;color:var(--mute);padding-bottom:10px}
+</style>
+</head>
+<body>
+<div id="orderView" class="wrap">
+<div class="app">
+<aside>
+  <div class="brand"><b>sade.</b><small>Simple food, happier mood</small></div>
+  <nav class="nav" aria-label="Navigasi">
+    <a href="#menu" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Menu</a>
+    <a href="#keranjang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>Pesanan saya<span class="badge" id="badge" hidden>0</span></a>
+    <a id="waChat" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/></svg>Hubungi kami</a>
+  </nav>
+</aside>
+
+<main id="menu">
+  <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A5E4C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input type="search" id="q" placeholder="Cari menu, mis. bakso, latte" aria-label="Cari menu"></label>
+  <h1 id="heading">Combo Deals</h1>
+  <div class="tabs" id="tabs" role="group" aria-label="Kategori"></div>
+  <div class="hint" id="hint"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<section id="keranjang" aria-label="Ringkasan pesanan">
+  <h2>Ringkasan pesanan</h2>
+  <div class="seg" id="tipe" style="grid-template-columns:repeat(3,minmax(0,1fr))" role="group" aria-label="Cara makan"></div>
+  <div id="lines" class="lines"></div>
+
+  <div class="blk">
+    <label class="f">Nama<input id="nama" maxlength="40" placeholder="Nama kamu" autocomplete="name"></label>
+    <label class="f" id="fMeja">Nomor meja<select id="meja"></select></label>
+    <label class="f" id="fWa">No WhatsApp<input id="wa" inputmode="tel" maxlength="20" placeholder="08xxxxxxxxxx"></label>
+    <label class="f" id="fAlamat">Alamat antar<textarea id="alamat" rows="2" maxlength="200" placeholder="Jalan, no. rumah/kos, patokan"></textarea></label>
+    <div class="f" id="fKuah"><span>Kuah bakso</span><div class="opt" id="kuah"></div></div>
+    <div class="f" id="fSayur"><span>Lalapan sayur</span><div class="opt" id="sayur"></div></div>
+    <div class="f"><span>Pembayaran</span><div class="opt" id="bayar"></div></div>
+    <label class="f">Catatan (opsional)<textarea id="catatan" rows="2" maxlength="200" placeholder="cth. tidak pedas, less sugar"></textarea></label>
+  </div>
+
+  <div class="blk">
+    <div class="sw"><div><b>Split bill</b><small>Bagi tagihan ke beberapa orang</small></div><button class="toggle" id="splitT" aria-pressed="false" aria-label="Split bill"><span></span></button></div>
+    <div id="splitBox" hidden style="display:flex;flex-direction:column;gap:14px">
+      <div class="seg" id="splitMode" style="grid-template-columns:repeat(2,minmax(0,1fr))" role="group" aria-label="Cara split"></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><div class="f"><span>Yang ikut bayar</span></div><div id="people" style="display:flex;flex-direction:column;gap:8px"></div><button class="dash" id="addP">+ Tambah orang</button></div>
+      <div id="splitItem" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div id="splitNom" style="display:flex;flex-direction:column;gap:8px"><button class="outline" id="rata">Bagi rata</button><div id="nomMsg" class="msg"></div></div>
+    </div>
+  </div>
+
+  <div class="blk sum num"><div><span>Jumlah item</span><span id="cnt">0</span></div><div class="big"><span>Total</span><span id="tot">Rp 0</span></div></div>
+  <a class="send" id="send" href="#" target="_blank" rel="noopener" aria-disabled="true">Pesan via WhatsApp</a>
+  <div class="why" id="why"></div>
+  <div class="fallback">Tidak terbuka? Kirim ke <code id="waNum"></code><button class="small" id="copy">Salin pesan</button></div>
+</section>
+</div>
+</div>
+
+<a class="mbar" id="mbar" href="#keranjang" hidden><div><small id="mCnt">0 item</small><b id="mTot" class="num">Rp 0</b></div><span class="go">Lihat pesanan</span></a>
+
+<div id="qrView" hidden>
+  <h2>QR untuk meja</h2>
+  <p style="color:var(--mute);font-size:14px">Screenshot kartu di bawah lalu cetak. Kartu Bungkus/Antar untuk kasir atau Instagram.</p>
+  <div class="qrs" id="qrs"></div>
+  <p><a href="#" id="toMenu" style="font-weight:800">← Kembali ke menu</a></p>
+</div>
+
+<script>
+/* ================= PENGATURAN ================= */
+var WA_ADMIN = '628211567880';      // nomor WhatsApp admin (format 62…)
+var JUMLAH_MEJA = 10;
+var PAGE_URL = 'https://frdigitalconsultant-boop.github.io/sade/';  // link halaman ini, untuk kartu QR
+var FOLDER_FOTO = 'img/';           // foto menu: img/<nama-menu>.jpg
+// [kategori, nama, harga Regular, harga Large (minuman)]
+var MENU = [
+  ['Combo Deals','Paket NDJ + Paha',22000],['Combo Deals','Paket NDJ + Dada',22000],['Combo Deals','Paket NP + Dada',21000],['Combo Deals','Paket NP + Paha',21000],
+  ['Combo Deals','Paket NDJ + Lele',18000],['Combo Deals','Paket NP + Lele',17000],['Combo Deals','Paket NDJ + Usus Ati',20000],['Combo Deals','Paket NP + Usus Ati',19000],
+  ['Combo Deals','Paket NDJ + Sarsus',20000],['Combo Deals','Paket NP + Sarsus',19000],
+  ['Lalapan','Ayam Ungkep Paha',14000],['Lalapan','Ayam Ungkep Dada',14000],['Lalapan','Hati Rempelo Goreng',8000],['Lalapan','Usus Goreng Ungkep',8000],
+  ['Lalapan','Sarang Usus',12000],['Lalapan','Lele Ungkep Goreng',10000],
+  ['Nasi','Nasi Putih',4000],['Nasi','Nasi Daun Jeruk',5000],
+  ['Bakso','Bakso Halus',2500],['Bakso','Bakso Kasar',2500],['Bakso','Bakso Ranjau',4000],['Bakso','Bakso Mercon',5000],['Bakso','Bakso Keju',4000],
+  ['Bakso','Bakso Ikan',2500],['Bakso','Bakso Jamur',3000],['Bakso','Bakso Salmon',2500],['Bakso','Dumpling Keju',2500],['Bakso','Dumpling Ayam Pedas',2500],
+  ['Bakso','Odeng Ori',2500],['Bakso','Odeng Spicy',2500],['Bakso','Tahu Bakso',3000],['Bakso','Mie Kuning',1000],
+  ['Coffee','Iced Americano',12000,15000],['Coffee','Hazelnut Coffee Latte',16000,19000],['Coffee','Palm Sugar Coffee Latte',16000,19000],
+  ['Coffee','Butterscotch Seasalt',16000,19000],['Coffee','Caramel Macchiato',16000,19000],
+  ['Latte Series','Matcha Latte',14000,17000],['Latte Series','Taro Matcha Latte',16000,19000],['Latte Series','Strawberry Matcha Latte',16000,19000],
+  ['Latte Series','Taro Latte',14000,17000],['Latte Series','Pure Chocolate',14000,17000],
+  ['Tea & Fresh','Tea Sade',6000,8000],['Tea & Fresh','Lemon Tea',8000,10000],['Tea & Fresh','Thai Tea',10000,12000],['Tea & Fresh','Iced Orange',8000,10000],
+  ['Mocktail','Coffee Cola',13000,15000],['Mocktail','Blue Ocean',13000,15000],['Mocktail','Mountain Dew',13000,15000],['Mocktail','Blue Lagoon',13000,15000],['Mocktail','Berry Orange',13000,15000]
+];
+var HINT = {'Combo Deals':'Sudah termasuk minuman · NDJ = Nasi Daun Jeruk, NP = Nasi Putih','Lalapan':'Tanpa nasi, tambah nasi di kategori Nasi'};
+var DRINKS = ['Coffee','Latte Series','Tea & Fresh','Mocktail'];
+/* ============================================== */
+
+var $ = function(id){ return document.getElementById(id); };
+var rp = function(n){ return 'Rp ' + Number(n).toLocaleString('id-ID'); };
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function slug(n){ return n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+function foto(x){ return FOLDER_FOTO + slug(x[1]) + '.jpg'; }
+
+var cats = []; MENU.forEach(function(x){ if (cats.indexOf(x[0]) < 0) cats.push(x[0]); });
+var S = { cat:cats[0], q:'', size:{}, qty:{}, cart:{}, tipe:'Takeaway', meja:'', kuah:'Original', sayur:'Pakai sayur', bayar:'QRIS',
+          split:false, splitMode:'item', people:['Orang 1','Orang 2'], assign:{}, nominal:[0,0], added:'' };
+
+var hm = /^#meja-(\d{1,2})$/.exec(location.hash || '');
+if (hm) { S.tipe = 'Dine-in'; S.meja = hm[1]; }
+
+$('waChat').href = 'https://wa.me/' + WA_ADMIN;
+$('waNum').textContent = '0' + WA_ADMIN.slice(2);
+var mo = '<option value="">Pilih meja</option>'; for (var i = 1; i <= JUMLAH_MEJA; i++) mo += '<option value="'+i+'">Meja '+i+'</option>';
+$('meja').innerHTML = mo; $('meja').value = S.meja;
+
+function segHTML(list, cur){ return list.map(function(o){ return '<button type="button" data-v="'+esc(o[0])+'" aria-pressed="'+(o[0]===cur)+'">'+esc(o[1])+'</button>'; }).join(''); }
+
+/* ---------- Menu ---------- */
+function renderMenu(){
+  var q = S.q.trim().toLowerCase();
+  $('tabs').innerHTML = cats.map(function(c){ return '<button type="button" class="pill" data-cat="'+esc(c)+'" aria-pressed="'+(!q && c===S.cat)+'">'+esc(c)+'</button>'; }).join('');
+  $('heading').textContent = q ? 'Hasil pencarian' : S.cat;
+  $('hint').textContent = q ? '' : (HINT[S.cat] || ''); $('hint').hidden = !$('hint').textContent;
+  var h = '';
+  MENU.forEach(function(x, i){
+    if (q ? x[1].toLowerCase().indexOf(q) < 0 : x[0] !== S.cat) return;
+    var sz = S.size[i] || 'R', price = (sz === 'L' && x[3]) ? x[3] : x[2], qty = S.qty[i] || 1, drink = DRINKS.indexOf(x[0]) >= 0;
+    var key = i + '_' + (x[3] ? sz : '');
+    h += '<div class="card"><img class="ph'+(drink?' drink':'')+'" src="'+foto(x)+'" alt="'+esc(x[1])+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;ph none&quot;>Foto menu</div>\'">'
+      + '<div class="ct"><span>'+esc(x[1])+'</span><b class="num">'+rp(price)+'</b></div>'
+      + (x[3] ? '<div><div class="lbl">Ukuran</div><div class="sizes"><button type="button" class="sz" data-size="'+i+'" data-v="R" aria-pressed="'+(sz==='R')+'">Regular</button><button type="button" class="sz" data-size="'+i+'" data-v="L" aria-pressed="'+(sz==='L')+'">Large</button></div></div>' : '')
+      + '<div class="act"><div class="step"><button type="button" data-q="'+i+'" data-d="-1" aria-label="Kurangi jumlah">−</button><span class="num">'+qty+'</span><button type="button" data-q="'+i+'" data-d="1" aria-label="Tambah jumlah">+</button></div>'
+      + '<button type="button" class="add" data-add="'+i+'">'+(S.added===key?'Ditambahkan ✓':'Tambah')+'</button></div></div>';
+  });
+  $('grid').innerHTML = h || '<div class="empty" style="grid-column:1/-1">Menu tidak ditemukan. Coba kata lain.</div>';
+}
+$('tabs').addEventListener('click', function(e){ var b = e.target.closest('[data-cat]'); if (!b) return; S.cat = b.dataset.cat; S.q = ''; $('q').value = ''; renderMenu(); });
+$('q').addEventListener('input', function(){ S.q = this.value; renderMenu(); });
+$('grid').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.size) { S.size[b.dataset.size] = b.dataset.v; renderMenu(); return; }
+  if (b.dataset.q) { var i = b.dataset.q; S.qty[i] = Math.max(1, Math.min(99, (S.qty[i]||1) + Number(b.dataset.d))); renderMenu(); return; }
+  if (b.dataset.add) {
+    var i = +b.dataset.add, x = MENU[i], key = i + '_' + (x[3] ? (S.size[i]||'R') : '');
+    S.cart[key] = Math.min(99, (S.cart[key]||0) + (S.qty[i]||1)); delete S.qty[i]; S.added = key;
+    clearTimeout(S._t); S._t = setTimeout(function(){ S.added = ''; renderMenu(); }, 1200);
+    renderMenu(); renderCart();
+  }
+});
+
+/* ---------- Keranjang ---------- */
+function lines(){
+  return Object.keys(S.cart).sort(function(a,b){ return parseInt(a,10)-parseInt(b,10); }).map(function(k){
+    var p = k.split('_'), x = MENU[+p[0]], u = p[1];
+    return { k:k, x:x, kat:x[0], label: x[1] + (u ? (u==='L' ? ' (Large)' : ' (Regular)') : ''), qty:S.cart[k], harga: u==='L' ? x[3] : x[2] };
+  });
+}
+function pname(pi){ return (S.people[pi]||'').trim() || ('Orang ' + (pi+1)); }
+
+function calc(){
+  var ls = lines(), count = 0, total = 0;
+  ls.forEach(function(l){ count += l.qty; total += l.qty*l.harga; });
+  var np = S.people.length, ptot = S.people.map(function(){return 0;}), pitems = S.people.map(function(){return [];}), units = [];
+  ls.forEach(function(l){ for (var u = 0; u < l.qty; u++){ var uk = l.k+'#'+u, who = S.assign[uk]; if (!(who >= 0 && who < np)) who = 0; ptot[who] += l.harga; pitems[who].push(l.label); units.push({uk:uk, l:l, u:u, who:who}); } });
+  var nominal = S.people.map(function(_,pi){ return S.nominal[pi]||0; }), diff = total - nominal.reduce(function(a,b){return a+b;},0);
+  return { ls:ls, count:count, total:total, ptot:ptot, pitems:pitems, units:units, nominal:nominal, diff:diff };
+}
+
+function renderCart(){
+  var c = calc(), ls = c.ls, isDine = S.tipe==='Dine-in', isAntar = S.tipe==='Delivery';
+  $('tipe').innerHTML = segHTML([['Dine-in','Makan di sini'],['Takeaway','Bungkus'],['Delivery','Antar']], S.tipe);
+  $('lines').innerHTML = ls.length ? ls.map(function(l){
+    return '<div class="line"><img src="'+foto(l.x)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;th&quot;></div>\'"><div class="g"><div class="t">'+esc(l.label)+'</div><div class="s num">'+rp(l.harga)+(l.qty>1?' · '+rp(l.harga*l.qty):'')+'</div></div>'
+      + '<div class="step"><button type="button" data-c="'+l.k+'" data-d="-1" aria-label="Kurangi">−</button><span class="num">'+l.qty+'</span><button type="button" data-c="'+l.k+'" data-d="1" aria-label="Tambah">+</button></div></div>';
+  }).join('') : '<div class="empty">Keranjang masih kosong.<br>Pilih menu lalu tekan Tambah.</div>';
+
+  $('fMeja').hidden = !isDine; $('fWa').hidden = isDine; $('fAlamat').hidden = !isAntar;
+  $('fWa').firstChild.textContent = isAntar ? 'No WhatsApp' : 'No WhatsApp (opsional)';
+  $('fKuah').hidden = !ls.some(function(l){ return l.kat==='Bakso'; });
+  $('fSayur').hidden = !ls.some(function(l){ return l.kat==='Combo Deals' || l.kat==='Lalapan'; });
+  $('kuah').innerHTML = segHTML([['Original','Original'],['Pedas','Pedas']], S.kuah);
+  $('sayur').innerHTML = segHTML([['Pakai sayur','Pakai sayur'],['Tanpa sayur','Tanpa sayur']], S.sayur);
+  $('bayar').innerHTML = segHTML([['QRIS','QRIS'],['Cash','Cash']], S.bayar);
+
+  // split
+  $('splitT').setAttribute('aria-pressed', S.split); $('splitBox').hidden = !S.split;
+  var isItem = S.splitMode === 'item';
+  $('splitMode').innerHTML = segHTML([['item','Per item'],['nominal','Per nominal']], S.splitMode);
+  $('people').innerHTML = S.people.map(function(nm, pi){
+    return '<div class="person"><span class="no">'+(pi+1)+'</span><input data-pn="'+pi+'" value="'+esc(nm)+'" maxlength="20" aria-label="Nama orang '+(pi+1)+'">'
+      + (isItem ? '<span class="tot num">'+rp(c.ptot[pi])+'</span>' : '<input class="amt num" data-pa="'+pi+'" inputmode="numeric" placeholder="Rp 0" value="'+(c.nominal[pi]?c.nominal[pi].toLocaleString('id-ID'):'')+'" aria-label="Nominal '+esc(pname(pi))+'">')
+      + (S.people.length > 2 ? '<button type="button" class="x" data-rm="'+pi+'" aria-label="Hapus orang">×</button>' : '') + '</div>';
+  }).join('');
+  $('addP').hidden = S.people.length >= 10;
+  $('splitItem').hidden = !isItem; $('splitNom').hidden = isItem;
+  if (isItem) $('splitItem').innerHTML = '<div class="f"><span>Siapa bayar menu apa</span></div>' + (c.units.length ? c.units.map(function(u){
+    return '<div class="sl"><div class="h"><b>'+esc(u.l.label)+(u.l.qty>1?' · '+(u.u+1)+'/'+u.l.qty:'')+'</b><span class="num">'+rp(u.l.harga)+'</span></div><div class="chips">'
+      + S.people.map(function(_,pi){ return '<button type="button" data-as="'+u.uk+'" data-p="'+pi+'" aria-pressed="'+(u.who===pi)+'">'+esc(pname(pi))+'</button>'; }).join('') + '</div></div>';
+  }).join('') : '<div class="why" style="text-align:left">Tambahkan menu dulu.</div>');
+  else { var ok = c.diff === 0 && c.total > 0; $('nomMsg').className = 'msg ' + (ok ? 'ok' : 'bad');
+    $('nomMsg').textContent = !c.total ? 'Tambahkan menu dulu.' : ok ? 'Pas, total sudah terbagi semua.' : c.diff > 0 ? 'Kurang ' + rp(c.diff) + ' lagi.' : 'Kelebihan ' + rp(-c.diff) + '.'; }
+
+  $('cnt').textContent = c.count; $('tot').textContent = rp(c.total);
+  $('badge').hidden = !c.count; $('badge').textContent = c.count;
+  $('mbar').hidden = !c.count; $('mCnt').textContent = c.count + ' item'; $('mTot').textContent = rp(c.total);
+  document.body.classList.toggle('hascart', c.count > 0);
+  updateSend(c);
+}
+
+function why(c){
+  if (!c.count) return 'Tambahkan menu dulu.';
+  if (!$('nama').value.trim()) return 'Isi nama dulu.';
+  if (S.tipe==='Dine-in' && !S.meja) return 'Pilih nomor meja.';
+  if (S.tipe==='Delivery' && (!$('alamat').value.trim() || !$('wa').value.trim())) return 'Alamat dan No WhatsApp wajib untuk diantar.';
+  if (S.split && S.splitMode==='nominal' && c.diff !== 0) return 'Nominal split belum pas dengan total.';
+  return '';
+}
+function buildMsg(c){
+  var nama = $('nama').value.trim(), wa = $('wa').value.trim(), alamat = $('alamat').value.trim(), cat = $('catatan').value.trim();
+  var where = S.tipe==='Dine-in' ? 'Makan di sini · Meja ' + (S.meja||'?') : S.tipe==='Delivery' ? 'Antar' : 'Bungkus';
+  var m = ['*PESANAN — sade.*', where, 'Nama: ' + (nama||'-') + (wa && S.tipe!=='Dine-in' ? ' (' + wa + ')' : '')];
+  if (S.tipe==='Delivery') m.push('Alamat: ' + alamat);
+  m.push('');
+  c.ls.forEach(function(l){ m.push('• ' + l.qty + 'x ' + l.label + ' — ' + rp(l.qty*l.harga)); });
+  m.push('', '*Total: ' + rp(c.total) + '*', 'Bayar: ' + S.bayar);
+  var note = [];
+  if (!$('fKuah').hidden) note.push('Kuah ' + S.kuah);
+  if (!$('fSayur').hidden) note.push(S.sayur);
+  if (cat) note.push(cat);
+  if (note.length) m.push('Catatan: ' + note.join(' · '));
+  if (S.split && c.count) {
+    var isItem = S.splitMode==='item';
+    m.push('', '*Split bill (' + (isItem ? 'per item' : 'per nominal') + ')*');
+    S.people.forEach(function(_, pi){ m.push('- ' + pname(pi) + ': ' + rp(isItem ? c.ptot[pi] : c.nominal[pi]) + (isItem && c.pitems[pi].length ? ' (' + c.pitems[pi].join(', ') + ')' : '')); });
+  }
+  return m.join('\n');
+}
+function updateSend(c){
+  c = c || calc(); var w = why(c), t = buildMsg(c);
+  $('send').href = 'https://wa.me/' + WA_ADMIN + '?text=' + encodeURIComponent(t);
+  $('send').setAttribute('aria-disabled', w ? 'true' : 'false');
+  $('why').textContent = w;
+  return t;
+}
+
+$('keranjang').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if (!b) return;
+  var seg = b.closest('#tipe,#kuah,#sayur,#bayar,#splitMode');
+  if (seg) { var key = {tipe:'tipe',kuah:'kuah',sayur:'sayur',bayar:'bayar',splitMode:'splitMode'}[seg.id]; S[key] = b.dataset.v; renderCart(); return; }
+  if (b.dataset.c) { var k = b.dataset.c, n = (S.cart[k]||0) + Number(b.dataset.d); if (n > 0) S.cart[k] = Math.min(99, n); else delete S.cart[k]; renderCart(); return; }
+  if (b.id === 'splitT') { S.split = !S.split; renderCart(); return; }
+  if (b.id === 'addP') { S.people.push('Orang ' + (S.people.length+1)); renderCart(); return; }
+  if (b.dataset.rm) { var pi = +b.dataset.rm, a = {}; Object.keys(S.assign).forEach(function(k){ var v = S.assign[k]; if (v === pi) return; a[k] = v > pi ? v-1 : v; });
+    S.assign = a; S.people.splice(pi,1); S.nominal.splice(pi,1); renderCart(); return; }
+  if (b.dataset.as) { S.assign[b.dataset.as] = +b.dataset.p; renderCart(); return; }
+  if (b.id === 'rata') { var c = calc(), np = S.people.length, base = Math.floor(c.total/np/100)*100; S.nominal = S.people.map(function(){ return base; }); S.nominal[0] = c.total - base*(np-1); renderCart(); return; }
+  if (b.id === 'copy') { var t = updateSend(); try { navigator.clipboard.writeText(t).then(function(){ b.textContent = 'Tersalin'; setTimeout(function(){ b.textContent = 'Salin pesan'; }, 1800); }, function(){ b.textContent = 'Gagal menyalin'; }); } catch(err){ b.textContent = 'Gagal menyalin'; } }
+});
+$('keranjang').addEventListener('input', function(e){
+  var t = e.target;
+  if (t.dataset.pn) { S.people[+t.dataset.pn] = t.value; updateSend(); return; }
+  if (t.dataset.pa) { var v = Number(t.value.replace(/[^\d]/g,'')) || 0; S.nominal[+t.dataset.pa] = v; var pos = t.value.length; t.value = v ? v.toLocaleString('id-ID') : '';
+    var c = calc(), ok = c.diff === 0 && c.total > 0; $('nomMsg').className = 'msg ' + (ok ? 'ok' : 'bad');
+    $('nomMsg').textContent = ok ? 'Pas, total sudah terbagi semua.' : c.diff > 0 ? 'Kurang ' + rp(c.diff) + ' lagi.' : 'Kelebihan ' + rp(-c.diff) + '.'; updateSend(c); return; }
+  if (t.id === 'meja') S.meja = t.value;
+  updateSend();
+});
+$('keranjang').addEventListener('change', function(e){ if (e.target.dataset.pn) renderCart(); });
+$('send').addEventListener('click', function(e){ if (this.getAttribute('aria-disabled') === 'true') e.preventDefault(); });
+
+/* ---------- Kartu QR (#kartu-qr) ---------- */
+var qrMade = false;
+function route(){
+  var isQr = location.hash === '#kartu-qr';
+  $('qrView').hidden = !isQr; $('orderView').hidden = isQr; if (isQr) $('mbar').hidden = true;
+  if (isQr && !qrMade && window.QRCode) {
+    qrMade = true; var list = [['Bungkus / Antar', PAGE_URL]];
+    for (var i = 1; i <= JUMLAH_MEJA; i++) list.push(['Meja '+i, PAGE_URL+'#meja-'+i]);
+    $('qrs').innerHTML = list.map(function(q,j){ return '<div class="qr"><div class="hd">sade.</div><div class="code" id="qr'+j+'"></div><div class="lb">'+esc(q[0])+'</div><div class="sm">Scan untuk pesan</div></div>'; }).join('');
+    list.forEach(function(q,j){ new QRCode($('qr'+j), { text:q[1], width:150, height:150, correctLevel: QRCode.CorrectLevel.M }); });
+  }
+  var mm = /^#meja-(\d{1,2})$/.exec(location.hash || '');
+  if (mm) { S.tipe = 'Dine-in'; S.meja = mm[1]; $('meja').value = mm[1]; renderCart(); }
+}
+$('toMenu').addEventListener('click', function(e){ e.preventDefault(); location.hash = ''; route(); });
+window.addEventListener('hashchange', route);
+
+renderMenu(); renderCart(); route();
+</script>
+</body>
+</html>
