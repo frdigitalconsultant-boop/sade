@@ -57,7 +57,8 @@ h1{margin:0;font-size:36px;font-weight:800;letter-spacing:-.02em;color:var(--acc
 .step span{min-width:18px;text-align:center;font-weight:800}
 .add{flex:1;height:44px;border:0;border-radius:99px;background:var(--btn);color:#fff;font-size:13.5px;font-weight:700}
 .add:disabled{background:#D9C2B1;color:#5B4536;cursor:not-allowed}
-.add.done:disabled{background:var(--okS);color:var(--ok);cursor:default}
+.stat{flex:1;height:44px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--mute);background:var(--app);border:1px dashed var(--line2);text-align:center;padding:0 6px}
+.stat.on{background:var(--okS);color:var(--ok);border:0;font-weight:800}
 .card.off .ph{filter:grayscale(1);opacity:.55}.card.off .ct span{color:var(--mute)}
 .habis{flex:1;height:44px;border-radius:99px;background:#EEE3D6;color:var(--mute);font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .empty{padding:28px 12px;text-align:center;color:var(--mute);font-size:14px;border:1.5px dashed #E8CDB6;border-radius:16px}
@@ -284,14 +285,13 @@ function renderMenu(){
   MENU.forEach(function(x, i){
     if (q ? x[1].toLowerCase().indexOf(q) < 0 : x[0] !== S.cat) return;
     var sz = S.size[i] || 'R', price = (sz === 'L' && x[3]) ? x[3] : x[2], drink = DRINKS.indexOf(x[0]) >= 0;
-    var key = i + '_' + (x[3] ? sz : ''), off = habis(x), inCart = S.cart[key] || 0, qty = (S.qty[i] !== undefined) ? S.qty[i] : inCart;
-    var same = qty === inCart, addLbl = !inCart ? 'Tambah' : same ? 'Ditambahkan ✓' : qty === 0 ? 'Hapus' : 'Perbarui';
+    var key = i + '_' + (x[3] ? sz : ''), off = habis(x), qty = S.cart[key] || 0;
     h += '<div class="card'+(off?' off':'')+'"><img class="ph'+(drink?' drink':'')+'" src="'+foto(x)+'" alt="'+esc(x[1])+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;ph none&quot;>Foto menu</div>\'">'
       + '<div class="ct"><span>'+esc(x[1])+'</span><b class="num">'+rp(price)+'</b></div>'
       + (x[0] === 'Combo Deals' ? '<div class="inc">Termasuk Es Teh (Regular)</div>' : '')
       + (x[3] ? '<div><div class="lbl">Ukuran</div><div class="sizes"><button type="button" class="sz" data-size="'+i+'" data-v="R" aria-pressed="'+(sz==='R')+'">Regular</button><button type="button" class="sz" data-size="'+i+'" data-v="L" aria-pressed="'+(sz==='L')+'">Large</button></div></div>' : '')
       + (off ? '<div class="act"><div class="habis">Stok habis</div></div></div>' : '<div class="act"><div class="step"><button type="button" data-q="'+i+'" data-d="-1" aria-label="Kurangi jumlah">−</button><span class="num">'+qty+'</span><button type="button" data-q="'+i+'" data-d="1" aria-label="Tambah jumlah">+</button></div>'
-      + '<button type="button" class="add'+(inCart&&same?' done':'')+'" data-add="'+i+'"'+(same?' disabled':'')+'>'+addLbl+'</button></div></div>');
+      + '<div class="stat'+(qty?' on':'')+'">'+(qty ? '✓ Di keranjang' : 'Tekan + untuk pesan')+'</div></div></div>');
   });
   $('grid').innerHTML = h || '<div class="empty" style="grid-column:1/-1">Menu tidak ditemukan. Coba kata lain.</div>';
 }
@@ -299,16 +299,12 @@ $('tabs').addEventListener('click', function(e){ var b = e.target.closest('[data
 $('q').addEventListener('input', function(){ S.q = this.value; renderMenu(); });
 $('grid').addEventListener('click', function(e){
   var b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.size) { S.size[b.dataset.size] = b.dataset.v; delete S.qty[b.dataset.size]; renderMenu(); return; }
-  if ((b.dataset.q || b.dataset.add) && habis(MENU[+(b.dataset.q || b.dataset.add)])) return;
-  if (b.dataset.q) { var i = +b.dataset.q, x = MENU[i], k = i + '_' + (x[3] ? (S.size[i]||'R') : ''), cur = (S.qty[i] !== undefined) ? S.qty[i] : (S.cart[k]||0);
-    S.qty[i] = Math.max(0, Math.min(99, cur + Number(b.dataset.d))); renderMenu(); return; }
-  if (b.dataset.add) {
-    var i = +b.dataset.add, x = MENU[i], key = i + '_' + (x[3] ? (S.size[i]||'R') : '');
-    if (S.qty[i] === undefined) return;
-    // angka di kartu = jumlah di keranjang (tidak direset ke 0)
-    if (S.qty[i] > 0) S.cart[key] = S.qty[i]; else { delete S.cart[key]; delete S.notes[key]; }
-    delete S.qty[i];
+  if (b.dataset.size) { S.size[b.dataset.size] = b.dataset.v; renderMenu(); return; }
+  if (b.dataset.q && habis(MENU[+b.dataset.q])) return;
+  if (b.dataset.q) {
+    // + / − langsung mengubah keranjang (tanpa tombol Tambah)
+    var i = +b.dataset.q, x = MENU[i], k = i + '_' + (x[3] ? (S.size[i]||'R') : ''), n = Math.max(0, Math.min(99, (S.cart[k]||0) + Number(b.dataset.d)));
+    if (n > 0) S.cart[k] = n; else { delete S.cart[k]; delete S.notes[k]; }
     renderMenu(); renderCart();
   }
 });
@@ -344,7 +340,7 @@ function renderCart(){
     return '<div class="lineW"><div class="line">'+(l.x ? '<img src="'+foto(l.x)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;th&quot;></div>\'">' : '<div class="th"></div>')+'<div class="g"><div class="t">'+esc(l.label)+'</div><div class="s num">'+rp(l.harga)+(l.qty>1?' · '+rp(l.harga*l.qty):'')+'</div></div>'
       + '<div class="step"><button type="button" data-c="'+l.k+'" data-d="-1" aria-label="Kurangi">−</button><span class="num">'+l.qty+'</span><button type="button" data-c="'+l.k+'" data-d="1" aria-label="Tambah">+</button></div></div>'
       + (l.x ? '<input class="note" data-nt="'+l.k+'" maxlength="80" value="'+esc(S.notes[l.k]||'')+'" placeholder="'+(DRINKS.indexOf(l.kat) >= 0 ? 'Catatan: less sugar, less ice…' : 'Catatan: tanpa bawang goreng, tidak pedas…')+'" aria-label="Catatan untuk '+esc(l.label)+'">' : '') + '</div>';
-  }).join('') : '<div class="empty">Keranjang masih kosong.<br>Pilih menu lalu tekan Tambah.</div>';
+  }).join('') : '<div class="empty">Keranjang masih kosong.<br>Tekan + pada menu untuk memesan.</div>';
 
   $('fMeja').hidden = !isDine; $('fWa').hidden = isDine; $('fAlamat').hidden = !isAntar;
   $('fWa').firstChild.textContent = isAntar ? 'No WhatsApp' : 'No WhatsApp (opsional)';
@@ -424,7 +420,7 @@ $('keranjang').addEventListener('click', function(e){
   if (seg) { var key = {tipe:'tipe',kuah:'kuah',sayur:'sayur',bayar:'bayar',splitMode:'splitMode'}[seg.id]; S[key] = b.dataset.v; renderCart(); return; }
   if (b.dataset.sb) { S.sambel = Math.max(0, Math.min(20, S.sambel + Number(b.dataset.sb))); renderCart(); return; }
   if (b.dataset.c === 'sambel') { S.sambel = Math.max(0, Math.min(20, S.sambel + Number(b.dataset.d))); renderCart(); return; }
-  if (b.dataset.c) { var k = b.dataset.c, n = (S.cart[k]||0) + Number(b.dataset.d); if (n > 0) S.cart[k] = Math.min(99, n); else { delete S.cart[k]; delete S.notes[k]; } delete S.qty[parseInt(k,10)]; renderCart(); renderMenu(); return; }
+  if (b.dataset.c) { var k = b.dataset.c, n = (S.cart[k]||0) + Number(b.dataset.d); if (n > 0) S.cart[k] = Math.min(99, n); else { delete S.cart[k]; delete S.notes[k]; } renderCart(); renderMenu(); return; }
   if (b.id === 'splitT') { S.split = !S.split; renderCart(); return; }
   if (b.id === 'addP') { S.people.push('Orang ' + (S.people.length+1)); renderCart(); return; }
   if (b.dataset.rm) { var pi = +b.dataset.rm, a = {}; Object.keys(S.assign).forEach(function(k){ var v = S.assign[k]; if (v === pi) return; a[k] = v > pi ? v-1 : v; });
