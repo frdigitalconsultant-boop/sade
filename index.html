@@ -105,7 +105,9 @@ h2{margin:0;font-size:22px;font-weight:800;color:var(--acc)}
 .sum div{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2)}
 .sum .big{font-size:18px;font-weight:800;color:var(--ink)}
 .send{display:flex;align-items:center;justify-content:center;height:52px;border-radius:99px;background:var(--btn);color:#fff;font-size:15px;font-weight:800;text-decoration:none;border:0;width:100%}
-.send[aria-disabled=true]{background:#D9C2B1;color:#5B4536;pointer-events:none}
+.send[aria-disabled=true]{background:#D9C2B1;color:#5B4536}
+.why.warn{color:#fff;background:var(--bad);border-radius:10px;padding:8px 10px;font-weight:800;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .why{font-size:12.5px;color:var(--mute);text-align:center;min-height:16px}
 .fallback{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--mute)}
 .fallback code{font-family:inherit;font-weight:800;color:var(--ink)}
@@ -202,7 +204,7 @@ h2{margin:0;font-size:22px;font-weight:800;color:var(--acc)}
   </div>
 
   <div class="blk sum num"><div><span>Jumlah item</span><span id="cnt">0</span></div><div class="big"><span>Total</span><span id="tot">Rp 0</span></div></div>
-  <a class="send" id="send" href="#" target="_blank" rel="noopener" aria-disabled="true">Pesan via WhatsApp</a>
+  <a class="send" id="send" href="#" rel="noopener" aria-disabled="true">Pesan via WhatsApp</a>
   <div class="why" id="why"></div>
   <div class="fallback">Tidak terbuka? Kirim ke <code id="waNum"></code><button class="small" id="copy">Salin pesan</button></div>
 </section>
@@ -436,7 +438,26 @@ $('keranjang').addEventListener('input', function(e){
   updateSend();
 });
 $('keranjang').addEventListener('change', function(e){ if (e.target.dataset.pn) renderCart(); if (e.target.id === 'paid') updateSend(); });
-$('send').addEventListener('click', function(e){ if (this.getAttribute('aria-disabled') === 'true') e.preventDefault(); });
+$('send').addEventListener('click', function(e){
+  e.preventDefault();
+  var c = calc(), w = why(c);
+  if (w) {
+    // kasih tahu kenapa belum bisa kirim, lalu arahkan ke kolom yang perlu diisi
+    var el = $('why'); el.textContent = w; el.classList.remove('warn'); void el.offsetWidth; el.classList.add('warn');
+    clearTimeout(S._w); S._w = setTimeout(function(){ el.classList.remove('warn'); }, 2500);
+    var go = !c.count ? null : !$('nama').value.trim() ? $('nama') : (S.tipe==='Dine-in' && !S.meja) ? $('meja')
+           : (S.tipe==='Delivery' && !$('alamat').value.trim()) ? $('alamat') : (S.tipe==='Delivery' && !$('wa').value.trim()) ? $('wa')
+           : (S.split && S.splitMode==='nominal' && c.diff !== 0) ? $('splitBox') : (S.bayar==='QRIS' && !$('paid').checked) ? $('paid') : null;
+    if (go) { go.scrollIntoView({ behavior:'smooth', block:'center' }); if (go.focus) try { go.focus({ preventScroll:true }); } catch(_){} }
+    return;
+  }
+  var url = 'https://wa.me/' + WA_ADMIN + '?text=' + encodeURIComponent(buildMsg(c));
+  // HP: buka langsung di tab yang sama (paling aman di browser Instagram/WhatsApp/scan QR).
+  // Laptop: coba tab baru supaya halaman menu tidak hilang; kalau diblokir, buka di tab yang sama.
+  var hp = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  if (!hp) { var win = window.open(url, '_blank'); if (win) { try { win.opener = null; } catch(_){} return; } }
+  location.href = url;
+});
 
 /* ---------- Kartu QR (#kartu-qr) ---------- */
 var qrMade = false;
