@@ -56,6 +56,7 @@ h1{margin:0;font-size:36px;font-weight:800;letter-spacing:-.02em;color:var(--acc
 .step button{width:40px;height:44px;border:0;background:transparent;font-size:18px;font-weight:700;color:var(--ink2)}
 .step span{min-width:18px;text-align:center;font-weight:800}
 .add{flex:1;height:44px;border:0;border-radius:99px;background:var(--btn);color:#fff;font-size:13.5px;font-weight:700}
+.add:disabled{background:#D9C2B1;color:#5B4536;cursor:not-allowed}
 .card.off .ph{filter:grayscale(1);opacity:.55}.card.off .ct span{color:var(--mute)}
 .habis{flex:1;height:44px;border-radius:99px;background:#EEE3D6;color:var(--mute);font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .empty{padding:28px 12px;text-align:center;color:var(--mute);font-size:14px;border:1.5px dashed #E8CDB6;border-radius:16px}
@@ -288,7 +289,7 @@ function renderMenu(){
       + (x[0] === 'Combo Deals' ? '<div class="inc">Termasuk Es Teh (Regular)</div>' : '')
       + (x[3] ? '<div><div class="lbl">Ukuran</div><div class="sizes"><button type="button" class="sz" data-size="'+i+'" data-v="R" aria-pressed="'+(sz==='R')+'">Regular</button><button type="button" class="sz" data-size="'+i+'" data-v="L" aria-pressed="'+(sz==='L')+'">Large</button></div></div>' : '')
       + (off ? '<div class="act"><div class="habis">Stok habis</div></div></div>' : '<div class="act"><div class="step"><button type="button" data-q="'+i+'" data-d="-1" aria-label="Kurangi jumlah">−</button><span class="num">'+qty+'</span><button type="button" data-q="'+i+'" data-d="1" aria-label="Tambah jumlah">+</button></div>'
-      + '<button type="button" class="add" data-add="'+i+'">'+(S.added===key?'Ditambahkan ✓':'Tambah')+'</button></div></div>');
+      + '<button type="button" class="add" data-add="'+i+'"'+(qty>0?'':' disabled')+'>'+(S.added===key?'Ditambahkan ✓':'Tambah')+'</button></div></div>');
   });
   $('grid').innerHTML = h || '<div class="empty" style="grid-column:1/-1">Menu tidak ditemukan. Coba kata lain.</div>';
 }
@@ -301,7 +302,8 @@ $('grid').addEventListener('click', function(e){
   if (b.dataset.q) { var i = b.dataset.q; S.qty[i] = Math.max(0, Math.min(99, (S.qty[i]||0) + Number(b.dataset.d))); renderMenu(); return; }
   if (b.dataset.add) {
     var i = +b.dataset.add, x = MENU[i], key = i + '_' + (x[3] ? (S.size[i]||'R') : '');
-    S.cart[key] = Math.min(99, (S.cart[key]||0) + (S.qty[i]||1)); delete S.qty[i]; S.added = key;
+    if (!(S.qty[i] > 0)) return;  // Tambah hanya aktif kalau jumlah sudah dipilih
+    S.cart[key] = Math.min(99, (S.cart[key]||0) + S.qty[i]); delete S.qty[i]; S.added = key;
     clearTimeout(S._t); S._t = setTimeout(function(){ S.added = ''; renderMenu(); }, 1200);
     renderMenu(); renderCart();
   }
